@@ -1,0 +1,14 @@
+[
+  {
+    "id": 3,
+    "app_name": "Pipedrive",
+    "auth_method": "Not found",
+    "access_type": "Could not verify",
+    "api_surface": "Could not verify",
+    "mcp": "Could not verify",
+    "buildability_verdict": "Could not verify",
+    "evidence_url": "",
+    "pass": "heuristic-v1",
+    "note": "No fetched page with enough text."
+  }
+]

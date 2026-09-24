@@ -1,0 +1,50 @@
+[
+  {
+    "id": 3,
+    "app_name": "Pipedrive",
+    "category": "CRM and Sales",
+    "category_id": "crm",
+    "website": "https://www.pipedrive.com",
+    "hint": "pipedrive.com",
+    "search_queries": [
+      "Pipedrive API authentication API token OAuth documentation"
+    ],
+    "fetcher": "composio.tools.execute COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+    "pages": [
+      {
+        "url": "https://developers.pipedrive.com/docs/api/v1",
+        "final_url": "https://developers.pipedrive.com/docs/api/v1",
+        "status": null,
+        "error": "403 This API key does not have the permissions required for POST /api/v3.1/tools/execute/COMPOSIO_SEARCH_FETCH_URL_CONTENT. This route requires \"tool_execution\" write access, but the key has no access for \"tool_execution\".",
+        "title": "",
+        "chars": 0,
+        "excerpt": "",
+        "tool": "COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+        "via": null
+      },
+      {
+        "url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
+        "final_url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
+        "status": null,
+        "error": "403 This API key does not have the permissions required for POST /api/v3.1/tools/execute/COMPOSIO_SEARCH_FETCH_URL_CONTENT. This route requires \"tool_execution\" write access, but the key has no access for \"tool_execution\".",
+        "title": "",
+        "chars": 0,
+        "excerpt": "",
+        "tool": "COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+        "via": null
+      },
+      {
+        "url": "https://developers.pipedrive.com/docs/api/v1/Getting-started",
+        "final_url": "https://developers.pipedrive.com/docs/api/v1/Getting-started",
+        "status": null,
+        "error": "403 This API key does not have the permissions required for POST /api/v3.1/tools/execute/COMPOSIO_SEARCH_FETCH_URL_CONTENT. This route requires \"tool_execution\" write access, but the key has no access for \"tool_execution\".",
+        "title": "",
+        "chars": 0,
+        "excerpt": "",
+        "tool": "COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+        "via": null
+      }
+    ],
+    "ok_count": 0
+  }
+]
