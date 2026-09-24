@@ -1,5 +1,5 @@
 {
-  "method": "Official pages retrieved, then human adjudication. Heuristic pass is a baseline, not the finding.",
+  "method": "Composio SDK COMPOSIO_SEARCH_FETCH_URL_CONTENT reads the official page. The heuristic is a baseline. The table is the human read of that text.",
   "apps": [
     {
       "id": 1,

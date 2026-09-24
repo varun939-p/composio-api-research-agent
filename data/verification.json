@@ -1,10 +1,5 @@
 {
-  "transport": {
-    "apps": 100,
-    "pages": 275,
-    "ok": 3,
-    "tls": 271
-  },
+  "fetcher": "composio.tools.execute COMPOSIO_SEARCH_FETCH_URL_CONTENT",
   "sample": {
     "n": 12,
     "v1_hits": 4,

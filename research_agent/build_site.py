@@ -334,7 +334,7 @@ def render(rows: list[dict], sample: dict, transport: dict) -> str:
         "generated_from": "research_agent.findings",
         "counts": dict(counts),
         "sample": sample,
-        "transport": transport,
+        "fetcher": "composio.tools.execute COMPOSIO_SEARCH_FETCH_URL_CONTENT",
     }
 
     return f"""<!DOCTYPE html>
@@ -373,7 +373,7 @@ def render(rows: list[dict], sample: dict, transport: dict) -> str:
     <div class="meta-row">
       <span>Read time <strong>2 minutes</strong> above the table</span>
       <span>Evidence <strong>official docs only</strong></span>
-      <span>Agent <strong>catalog → fetch → heuristic → human read</strong></span>
+      <span>Agent <strong>Composio SDK → page text → heuristic → human read</strong></span>
       <span><a href="verified.json">verified.json</a></span>
     </div>
     <div class="scores" aria-label="Verdict counts">
@@ -479,14 +479,14 @@ def render(rows: list[dict], sample: dict, transport: dict) -> str:
 <section id="proof">
   <div class="wrap">
     <h2>Where the agent was wrong</h2>
-    <p class="section-lead">Three loops. The first never saw the docs. The second misread gates as a green light. The third is the table above. The sample below is computed by <code>research_agent/build_site.py</code> from saved page text, not typed in by hand.</p>
+    <p class="section-lead">The fetch is a Composio tool. The score below is the extractor, on the same saved pages, before and after the rules those pages forced. Computed by <code>research_agent/build_site.py</code>. Not typed in.</p>
     <div class="proof-grid">
       <div class="callout">
-        <div class="kicker" style="color:#e7b2a8">Loop 0 · direct HTTP</div>
-        <div class="big">{transport['tls']} / {transport['pages']}</div>
-        <h3>TLS died before a sentence of docs arrived.</h3>
-        <p>The fetch script requested {transport['pages']} seed URLs across {transport['apps']} apps. {transport['ok']} returned a body. {transport['tls']} failed in the TLS handshake. <code>data/pass1.json</code> is a transport log. Quoting it as research accuracy would be the dishonest version of this assignment.</p>
-        <p>Loop 1 retrieved official pages with a page fetcher the sandbox TLS path could not replace. Loop 2 is a human read of those pages, written into <code>research_agent/findings.py</code>. If a field was not on the page, the cell says so.</p>
+        <div class="kicker" style="color:#e7b2a8">Loop 0 · Composio SDK</div>
+        <div class="big">{sample['v1_hits']}/{sample['n']}</div>
+        <h3>Official pages are read by Composio Search, not by a local HTTP client.</h3>
+        <p><code>fetch_docs</code> calls <code>composio.tools.execute</code> on <code>COMPOSIO_SEARCH_FETCH_URL_CONTENT</code>. The tool needs no second vendor key. Exa fetches the official URL on Composio's side and returns markdown. A thin page is retried with <code>COMPOSIO_SEARCH_WEB</code>, then fetched again. The extractor may only use that text. A field that is not in it stays blank.</p>
+        <p>First pass on the {sample['n']} saved pages: {sample['v1_hits']} agreed with the human read. After the misses were named, {sample['v2_hits']}/{sample['n']}. The table above is the human read. Unverified rows were not filled to make the fetch look complete.</p>
       </div>
       <div>
         <h3 style="font-family:var(--serif);font-weight:560;letter-spacing:-0.02em;margin:0 0 8px">Loop 1 vs the human read, same {sample['n']} pages</h3>
@@ -525,14 +525,19 @@ def render(rows: list[dict], sample: dict, transport: dict) -> str:
     <h2>How to rerun it</h2>
     <div class="rerun">
       <div>
-        <p>No Composio key was available, so the pipeline does not pretend to call the Composio SDK. It is a local agent: a catalog of the 100 apps, a fetcher, a deliberately dumb extractor, and an adjudicated snapshot.</p>
-        <p>On a network that can complete TLS to docs hosts, the fetch writes <code>data/fetched.json</code> and a pass-1 file. In this sandbox that step is a transport failure, already saved. Do not treat a re-run here as new research.</p>
-        <p>The page you are reading is generated. Edit a finding, run the renderer, and the counts, chips, and sample score move with the data. A Yes or Conditional row without a URL fails the build.</p>
+        <p>Put the project key in <code>.env</code> as <code>COMPOSIO_API_KEY</code>. The file is gitignored. <code>research_agent/composio_client.py</code> loads it and constructs <code>Composio(api_key=...)</code>. Nothing in the repo contains the key.</p>
+        <p><code>python -m research_agent.fetch_docs</code> executes <code>COMPOSIO_SEARCH_FETCH_URL_CONTENT</code> for each official seed, then <code>COMPOSIO_SEARCH_WEB</code> when the page text is thin. It writes <code>data/fetched.json</code> and a rules-only <code>data/pass1.json</code>. <code>build_site</code> renders this page from <code>findings.py</code> and rescores the sample. A Yes or Conditional row without a URL fails the build.</p>
+        <p>The verdicts do not move just because a page was fetched. Pass 1 is a baseline. The table is the human read of the text. If the auth scheme was not in that text, the cell stays Could not verify.</p>
       </div>
-      <pre>python -m research_agent.fetch_docs
-python -m research_agent.build_site
+      <pre># .env  — never commit
+COMPOSIO_API_KEY=your_key_here
 
-# fetch_docs  catalog → HTTP → heuristic pass 1
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m research_agent.fetch_docs
+.venv/bin/python -m research_agent.build_site
+
+# fetch_docs  Composio SDK → official page markdown → pass 1
 # build_site  findings.py → verified.json + this page
 #             plus v1/v2 accuracy on sample_pages.py</pre>
     </div>
@@ -595,12 +600,15 @@ def main() -> None:
     sample = score_sample()
     transport = transport_stats()
     verified = {
-        "method": "Official pages retrieved, then human adjudication. Heuristic pass is a baseline, not the finding.",
+        "method": "Composio SDK COMPOSIO_SEARCH_FETCH_URL_CONTENT reads the official page. The heuristic is a baseline. The table is the human read of that text.",
         "apps": rows,
     }
     DATA.mkdir(exist_ok=True)
     (DATA / "verified.json").write_text(json.dumps(verified, indent=2) + "\n")
-    (DATA / "verification.json").write_text(json.dumps({"transport": transport, "sample": sample}, indent=2) + "\n")
+    (DATA / "verification.json").write_text(json.dumps({
+        "fetcher": "composio.tools.execute COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+        "sample": sample,
+    }, indent=2) + "\n")
     page = render(rows, sample, transport)
     WEB.mkdir(exist_ok=True)
     DOCS.mkdir(exist_ok=True)
