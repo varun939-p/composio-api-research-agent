@@ -20,9 +20,9 @@ FINDINGS: dict[int, dict] = {
         "api_surface": "REST",
         "mcp": "None found on the fetched page",
         "buildability_verdict": "Conditional",
-        "blocker": "OAuth via an external client app or connected app. As of Spring '26, new connected apps can only be created through the API. A Salesforce org is required; a free developer-edition path was not on this page.",
-        "evidence_url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_oauth_and_connected_apps.html",
-        "quote": "",
+        "blocker": "OAuth 2.0 via an external client app or a connected app. New connected apps are restricted as of Spring '26; existing ones still work, and creating a new one means contacting Salesforce Support. External client apps are the recommended path. A free developer-edition signup was not on this page.",
+        "evidence_url": "https://developer.salesforce.com/docs/platform/api-rest/guide/intro-oauth-and-connected-apps.html",
+        "quote": "Creating connected apps is restricted as of Spring '26. You can continue to use existing connected apps during and after Spring '26. However, we recommend using external client apps instead. If you must continue creating connected apps, contact Salesforce Support.",
         "confidence": "fetched",
     },
     2: {
